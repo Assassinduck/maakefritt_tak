@@ -1,629 +1,658 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Måkefritt tak</title>
-<style>
-  :root {
-    --ui-bg: rgba(0,0,0,0.45);
-    --ui-fg: #fff;
-    --accent: #6bdcff;
-  }
-  html, body {
-    height: 100%;
-  }
-  body {
-    margin: 0;
-    overflow: hidden;
-    background: linear-gradient(#87c9ff, #bfe3ff 40%, #eaf6ff);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
-    color: var(--ui-fg);
-  }
-  #game {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100vw;
-    height: 100vh;
-    touch-action: none; /* for better touch control */
-  }
-  .hud {
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    right: 12px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    background: var(--ui-bg);
-    padding: 10px 12px;
-    border-radius: 10px;
-    backdrop-filter: blur(4px);
-  }
-  .hud .group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-  .bar {
-    width: min(40vw, 320px);
-    height: 10px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .bar > span {
-    display: block;
-    height: 100%;
-    width: 50%;
-    background: linear-gradient(90deg, #8af27a, #e8f77a);
-  }
-  .spacer { flex: 1 }
-  .btn {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: var(--ui-fg);
-    border-radius: 8px;
-    padding: 6px 10px;
-    cursor: pointer;
-    user-select: none;
-    font-weight: 600;
-  }
-  .btn:active { transform: translateY(1px); }
-  .overlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(3px);
-  }
-  .card {
-    background: var(--ui-bg);
-    color: var(--ui-fg);
-    padding: 18px 16px;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 90vw;
-  }
-  .card h1 {
-    margin: 0 0 6px 0;
-    font-size: clamp(20px, 4vw, 28px);
-  }
-  .card p {
-    margin: 6px 0;
-  }
-  .tips {
-    opacity: .9;
-    font-size: 0.95em;
-  }
-  .footer {
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    background: var(--ui-bg);
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Måkefritt tak</title>
+  <style>
+    :root {
+      --ui-bg: rgba(0, 0, 0, 0.45);
+      --ui-fg: #fff;
+      --accent: #6bdcff;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(#87c9ff, #bfe3ff 40%, #eaf6ff);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      color: var(--ui-fg);
+    }
+
+    #game {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+      /* for better touch control */
+    }
+
+    .hud {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: var(--ui-bg);
+      padding: 10px 12px;
+      border-radius: 10px;
+      backdrop-filter: blur(4px);
+    }
+
+    .hud .group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .bar {
+      width: min(40vw, 320px);
+      height: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar>span {
+      display: block;
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, #8af27a, #e8f77a);
+    }
+
+    .spacer {
+      flex: 1
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: var(--ui-fg);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .card {
+      background: var(--ui-bg);
+      color: var(--ui-fg);
+      padding: 18px 16px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 90vw;
+    }
+
+    .card h1 {
+      margin: 0 0 6px 0;
+      font-size: clamp(20px, 4vw, 28px);
+    }
+
+    .card p {
+      margin: 6px 0;
+    }
+
+    .tips {
+      opacity: .9;
+      font-size: 0.95em;
+    }
+
+    .footer {
+      position: fixed;
+      right: 10px;
+      bottom: 10px;
+      background: var(--ui-bg);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+  </style>
 </head>
+
 <body>
-<canvas id="game"></canvas>
+  <canvas id="game"></canvas>
 
-<div class="hud" id="hud">
-  <div class="group"><strong>Tid:</strong> <span id="time">0.0 s</span></div>
-  <div class="group"><strong>Renhet:</strong>
-    <div class="bar"><span id="cleanBar"></span></div>
-    <span id="cleanPct">100%</span>
+  <div class="hud" id="hud">
+    <div class="group"><strong>Tid:</strong> <span id="time">0.0 s</span></div>
+    <div class="group"><strong>Renhet:</strong>
+      <div class="bar"><span id="cleanBar"></span></div>
+      <span id="cleanPct">100%</span>
+    </div>
+    <div class="group"><strong>Beste:</strong> <span id="best">0.0 s</span></div>
+    <div class="spacer"></div>
+    <button class="btn" id="pauseBtn">Pause</button>
+    <button class="btn" id="resetBtn">Start på nytt</button>
   </div>
-  <div class="group"><strong>Beste:</strong> <span id="best">0.0 s</span></div>
-  <div class="spacer"></div>
-  <button class="btn" id="pauseBtn">Pause</button>
-  <button class="btn" id="resetBtn">Start på nytt</button>
-</div>
 
-<div class="overlay" id="overlay">
-  <div class="card">
-    <h1 id="title">Måkefritt tak</h1>
-    <p id="subtitle">Hold måkene unna solcellene ved å peke på dem med laseren.</p>
-    <p class="tips">
-      Mus/Touch = laser • P = pause • R = restart
-    </p>
-    <p id="result"></p>
-    <p style="opacity:.9">Tips: Kom nært måka med laseren så stikker den.</p>
-    <button class="btn" id="playBtn">Spill</button>
+  <div class="overlay" id="overlay">
+    <div class="card">
+      <h1 id="title">Måkefritt tak</h1>
+      <p id="subtitle">Hold måkene unna solcellene ved å peke på dem med laseren.</p>
+      <p class="tips">
+        Mus/Touch = laser • P = pause • R = restart
+      </p>
+      <p id="result"></p>
+      <p style="opacity:.9">Tips: Kom nært måka med laseren så stikker den.</p>
+      <button class="btn" id="playBtn">Spill</button>
+    </div>
   </div>
-</div>
 
-<div class="footer">v1.0</div>
+  <div class="footer">v1.0</div>
 
-<script>
-(() => {
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
+  <script>
+    (() => {
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
 
-  // HUD
-  const timeEl = document.getElementById('time');
-  const bestEl = document.getElementById('best');
-  const cleanBar = document.getElementById('cleanBar');
-  const cleanPctEl = document.getElementById('cleanPct');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const overlay = document.getElementById('overlay');
-  const playBtn = document.getElementById('playBtn');
-  const resultEl = document.getElementById('result');
-  const titleEl = document.getElementById('title');
+      // HUD
+      const timeEl = document.getElementById('time');
+      const bestEl = document.getElementById('best');
+      const cleanBar = document.getElementById('cleanBar');
+      const cleanPctEl = document.getElementById('cleanPct');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const overlay = document.getElementById('overlay');
+      const playBtn = document.getElementById('playBtn');
+      const resultEl = document.getElementById('result');
+      const titleEl = document.getElementById('title');
 
-  // DPR + resize
-  const state = {
-    w: 0, h: 0, dpr: Math.max(1, Math.min(window.devicePixelRatio || 1, 2)),
-    running: false,
-    paused: false,
-    time: 0,
-    best: Number(localStorage.getItem('makefritt_hs')||0),
-    cleanliness: 100,
-    gameOver: false,
-    pointer: {x: 0, y: 0, active: false},
-    birds: [],
-    droppings: [],
-    stains: [],
-    spawnTimer: 0,
-    spawnInterval: 1500,
-    difficultyTimer: 0,
-    roof: {x:0,y:0,w:0,h:0}
-  };
-  bestEl.textContent = state.best.toFixed(1) + " s";
-
-  function resize() {
-    state.w = window.innerWidth;
-    state.h = window.innerHeight;
-    const dpr = state.dpr;
-    canvas.width = Math.floor(state.w * dpr);
-    canvas.height = Math.floor(state.h * dpr);
-    canvas.style.width = state.w + 'px';
-    canvas.style.height = state.h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Roof rectangle (simple, bottom portion)
-    const marginX = Math.max(24, state.w * 0.08);
-    const roofW = Math.max(400, state.w - marginX*2);
-    const roofH = Math.max(180, state.h * 0.28);
-    const roofX = (state.w - roofW)/2;
-    const roofY = state.h - roofH - 40;
-    state.roof = {x: roofX, y: roofY, w: roofW, h: roofH};
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Helpers
-  const rand = (a,b)=> a + Math.random()*(b-a);
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const dist2 = (x1,y1,x2,y2)=>{const dx=x1-x2, dy=y1-y2; return dx*dx+dy*dy;};
-
-  // Input
-  function updatePointer(x, y) {
-    const rect = canvas.getBoundingClientRect();
-    state.pointer.x = x - rect.left;
-    state.pointer.y = y - rect.top;
-    state.pointer.active = true;
-  }
-  canvas.addEventListener('mousemove', (e)=> updatePointer(e.clientX, e.clientY));
-  canvas.addEventListener('mousedown', (e)=> updatePointer(e.clientX, e.clientY));
-  canvas.addEventListener('touchstart', (e)=> {
-    const t = e.touches[0];
-    updatePointer(t.clientX, t.clientY);
-    e.preventDefault();
-  }, {passive:false});
-  canvas.addEventListener('touchmove', (e)=> {
-    const t = e.touches[0];
-    updatePointer(t.clientX, t.clientY);
-    e.preventDefault();
-  }, {passive:false});
-  canvas.addEventListener('touchend', ()=> { state.pointer.active = false; });
-
-  // Buttons
-  pauseBtn.addEventListener('click', ()=> togglePause());
-  resetBtn.addEventListener('click', ()=> restart());
-  playBtn.addEventListener('click', ()=> start());
-
-  // Keyboard
-  window.addEventListener('keydown', (e)=>{
-    if (e.key === 'p' || e.key === 'P') togglePause();
-    if (e.key === 'r' || e.key === 'R') restart();
-  });
-
-  function showOverlay(show, message='') {
-    overlay.style.display = show ? 'flex' : 'none';
-    resultEl.textContent = message;
-  }
-
-  function start() {
-    state.running = true;
-    state.paused = false;
-    state.gameOver = false;
-    showOverlay(false);
-  }
-
-  function restart() {
-    state.time = 0;
-    state.cleanliness = 100;
-    state.birds.length = 0;
-    state.droppings.length = 0;
-    state.stains.length = 0;
-    state.spawnTimer = 0;
-    state.spawnInterval = 1500;
-    state.difficultyTimer = 0;
-    state.gameOver = false;
-    start();
-  }
-
-  function togglePause() {
-    if (!state.running) { start(); return; }
-    state.paused = !state.paused;
-    pauseBtn.textContent = state.paused ? 'Fortsett' : 'Pause';
-    if (state.paused) showOverlay(true, 'Pause'); else showOverlay(false);
-  }
-
-  // Entities
-  function spawnBird() {
-    const side = Math.random() < 0.5 ? 'left' : 'right';
-    const y = rand(60, state.roof.y - 40);
-    const speed = rand(70, 140);
-    const dir = side === 'left' ? 1 : -1;
-    const x = side === 'left' ? -40 : state.w + 40;
-    const wingPhase = Math.random()*Math.PI*2;
-    const bird = {
-      x, y,
-      vx: dir*speed,
-      vy: rand(-10, 10),
-      baseVy: rand(-8, 8),
-      amp: rand(10, 30),
-      flap: wingPhase,
-      scared: false,
-      dropCd: rand(0.8, 2.0),
-      size: rand(10, 16),
-      life: 0
-    };
-    state.birds.push(bird);
-  }
-
-  function addDropping(x,y) {
-    state.droppings.push({x, y, vy: rand(120, 200), r: rand(2, 3.5)});
-  }
-
-  function addStain(x,y) {
-    const r = rand(7, 16);
-    state.stains.push({x, y, r, t: 0});
-    // hygiene loss
-    state.cleanliness = clamp(state.cleanliness - rand(1.2, 2.5), 0, 100);
-  }
-
-  function update(dt) {
-    if (!state.running || state.paused || state.gameOver) return;
-
-    state.time += dt;
-    timeEl.textContent = state.time.toFixed(1) + " s";
-
-    // Difficulty ramps: spawn faster over time
-    state.difficultyTimer += dt;
-    if (state.difficultyTimer > 10) {
-      state.difficultyTimer = 0;
-      state.spawnInterval = clamp(state.spawnInterval * 0.9, 450, 1500);
-    }
-
-    state.spawnTimer += dt*1000;
-    if (state.spawnTimer >= state.spawnInterval) {
-      state.spawnTimer = 0;
-      // spawn 1-3 birds randomly at higher difficulty
-      const group = (state.spawnInterval < 700) ? (Math.random()<0.33?2:1) : 1;
-      for (let i=0;i<group;i++) spawnBird();
-    }
-
-    // Birds
-    for (let i=state.birds.length-1; i>=0; i--) {
-      const b = state.birds[i];
-      b.life += dt;
-
-      // Flap & slight sine wave motion
-      b.flap += dt*8;
-      b.vy = b.baseVy + Math.sin(b.flap) * b.amp * 0.2;
-
-      // If laser close -> scared (accelerate away from pointer)
-      const fearDist2 = 90*90;
-      if (state.pointer.active && dist2(b.x, b.y, state.pointer.x, state.pointer.y) < fearDist2) {
-        const dx = b.x - state.pointer.x;
-        const dy = b.y - state.pointer.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const ax = (dx/len) * 600;  // acceleration away
-        const ay = (dy/len) * 600 - 200; // go up a bit
-        b.vx += ax * dt;
-        b.vy += ay * dt;
-        b.scared = true;
-      } else if (b.scared) {
-        // slowly calm down
-        b.vx *= (1 - 0.5*dt);
-        b.vy *= (1 - 0.5*dt);
-      }
-
-      b.x += b.vx * dt;
-      b.y += b.vy * dt;
-
-      // Droppings (not when very scared / moving up fast)
-      b.dropCd -= dt;
-      if (b.dropCd <= 0 && b.vy > -60) {
-        b.dropCd = rand(1.2, 2.5);
-        addDropping(b.x, b.y+4);
-      }
-
-      // Remove if off screen for a while
-      if (b.x < -80 || b.x > state.w + 80 || b.y < -80 || b.y > state.h + 80) {
-        state.birds.splice(i,1);
-      }
-    }
-
-    // Droppings
-    const g = 600;
-    for (let i=state.droppings.length-1; i>=0; i--) {
-      const d = state.droppings[i];
-      d.vy += g * dt;
-      d.y += d.vy * dt;
-
-      // Hit roof?
-      const r = state.roof;
-      if (d.y >= r.y && d.x >= r.x && d.x <= r.x + r.w) {
-        addStain(d.x, r.y + Math.min((d.y - r.y), r.h - 6));
-        state.droppings.splice(i,1);
-        continue;
-      }
-      // Off screen
-      if (d.y > state.h + 50) state.droppings.splice(i,1);
-    }
-
-    // Cleanliness check
-    cleanBar.style.width = (state.cleanliness|0) + "%";
-    cleanPctEl.textContent = (state.cleanliness|0) + "%";
-    if (state.cleanliness <= 0) {
-      endGame();
-    }
-  }
-
-  function endGame() {
-    state.gameOver = true;
-    state.running = false;
-    const msg = `Spillet over • Tid: ${state.time.toFixed(1)} s`;
-    if (state.time > state.best) {
-      state.best = state.time;
-      localStorage.setItem('makefritt_hs', String(state.best));
+      // DPR + resize
+      const state = {
+        w: 0, h: 0, dpr: Math.max(1, Math.min(window.devicePixelRatio || 1, 2)),
+        running: false,
+        paused: false,
+        time: 0,
+        best: Number(localStorage.getItem('makefritt_hs') || 0),
+        cleanliness: 100,
+        gameOver: false,
+        pointer: { x: 0, y: 0, active: false },
+        birds: [],
+        droppings: [],
+        stains: [],
+        spawnTimer: 0,
+        spawnInterval: 1500,
+        difficultyTimer: 0,
+        roof: { x: 0, y: 0, w: 0, h: 0 }
+      };
       bestEl.textContent = state.best.toFixed(1) + " s";
-      showOverlay(true, msg + " (ny rekord!)");
-    } else {
-      showOverlay(true, msg);
-    }
-    pauseBtn.textContent = 'Pause';
-    titleEl.textContent = 'Måkefritt tak';
-  }
 
-  // Drawing
-  function draw() {
-    const w = state.w, h = state.h;
-    // Sky is background via CSS
+      function resize() {
+        state.w = window.innerWidth;
+        state.h = window.innerHeight;
+        const dpr = state.dpr;
+        canvas.width = Math.floor(state.w * dpr);
+        canvas.height = Math.floor(state.h * dpr);
+        canvas.style.width = state.w + 'px';
+        canvas.style.height = state.h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Soft clouds (simple parallax bands)
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.fillStyle = '#fff';
-    for (let i=0;i<5;i++) {
-      const yy = 40 + i*50 + Math.sin((performance.now()/2000)+i)*12;
-      ctx.beginPath();
-      for (let x=-100; x<w+100; x+=120) {
-        const r = 28 + (i*3);
-        ctx.moveTo(x, yy);
-        ctx.arc(x, yy, r, 0, Math.PI*2);
+        // Roof rectangle (simple, bottom portion)
+        const marginX = Math.max(24, state.w * 0.08);
+        const roofW = Math.max(400, state.w - marginX * 2);
+        const roofH = Math.max(180, state.h * 0.28);
+        const roofX = (state.w - roofW) / 2;
+        const roofY = state.h - roofH - 40;
+        state.roof = { x: roofX, y: roofY, w: roofW, h: roofH };
       }
-      ctx.fill();
-    }
-    ctx.restore();
+      resize();
+      window.addEventListener('resize', resize);
 
-    // Roof + panels
-    const r = state.roof;
-    // Roof base
-    ctx.fillStyle = '#5d6066';
-    roundRect(ctx, r.x, r.y, r.w, r.h, 10, true, false);
+      // Helpers
+      const rand = (a, b) => a + Math.random() * (b - a);
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const dist2 = (x1, y1, x2, y2) => { const dx = x1 - x2, dy = y1 - y2; return dx * dx + dy * dy; };
 
-    // Panel grid
-    const cols = Math.max(6, Math.floor(r.w / 120));
-    const rows = Math.max(3, Math.floor(r.h / 70));
-    const pad = 6;
-    const gap = 6;
-    const cellW = (r.w - pad*2 - gap*(cols-1)) / cols;
-    const cellH = (r.h - pad*2 - gap*(rows-1)) / rows;
-    for (let cy=0; cy<rows; cy++) {
-      for (let cx=0; cx<cols; cx++) {
-        const px = r.x + pad + cx*(cellW+gap);
-        const py = r.y + pad + cy*(cellH+gap);
-        ctx.fillStyle = '#0c2744';
-        roundRect(ctx, px, py, cellW, cellH, 6, true, false);
-        // Cells
-        ctx.fillStyle = '#0e3159';
-        const subCols = 4;
-        const subRows = 6;
-        const sgap = 2;
-        const sw = (cellW - (subCols+1)*sgap) / subCols;
-        const sh = (cellH - (subRows+1)*sgap) / subRows;
-        for (let sy=0; sy<subRows; sy++) {
-          for (let sx=0; sx<subCols; sx++) {
-            const sxp = px + sgap + sx*(sw+sgap);
-            const syp = py + sgap + sy*(sh+sgap);
-            ctx.fillRect(sxp, syp, sw, sh);
+      // Input
+      function updatePointer(x, y) {
+        const rect = canvas.getBoundingClientRect();
+        state.pointer.x = x - rect.left;
+        state.pointer.y = y - rect.top;
+        state.pointer.active = true;
+      }
+      canvas.addEventListener('mousemove', (e) => updatePointer(e.clientX, e.clientY));
+      canvas.addEventListener('mousedown', (e) => updatePointer(e.clientX, e.clientY));
+      canvas.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        updatePointer(t.clientX, t.clientY);
+        e.preventDefault();
+      }, { passive: false });
+      canvas.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        updatePointer(t.clientX, t.clientY);
+        e.preventDefault();
+      }, { passive: false });
+      canvas.addEventListener('touchend', () => { state.pointer.active = false; });
+
+      // Buttons
+      pauseBtn.addEventListener('click', () => togglePause());
+      resetBtn.addEventListener('click', () => restart());
+      playBtn.addEventListener('click', () => restart());
+
+      // Keyboard
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'p' || e.key === 'P') togglePause();
+        if (e.key === 'r' || e.key === 'R') restart();
+      });
+
+      function showOverlay(show, message = '') {
+        overlay.style.display = show ? 'flex' : 'none';
+        resultEl.textContent = message;
+      }
+
+      function start() {
+        state.running = true;
+        state.paused = false;
+        state.gameOver = false;
+        showOverlay(false);
+      }
+
+      function restart() {
+        state.time = 0;
+        state.cleanliness = 100;
+        state.birds.length = 0;
+        state.droppings.length = 0;
+        state.stains.length = 0;
+        state.spawnTimer = 0;
+        state.spawnInterval = 1500;
+        state.difficultyTimer = 0;
+        state.gameOver = false;
+        // Update HUD immediately
+        timeEl.textContent = state.time.toFixed(1) + " s";
+        cleanBar.style.width = (state.cleanliness | 0) + "%";
+        cleanPctEl.textContent = (state.cleanliness | 0) + "%";
+        start();
+      }
+
+      function togglePause() {
+        if (!state.running) { start(); return; }
+        state.paused = !state.paused;
+        pauseBtn.textContent = state.paused ? 'Fortsett' : 'Pause';
+        if (state.paused) showOverlay(true, 'Pause'); else showOverlay(false);
+      }
+
+      // Entities
+      function spawnBird() {
+        const side = Math.random() < 0.5 ? 'left' : 'right';
+        const y = rand(60, state.roof.y - 40);
+        const speed = rand(70, 140);
+        const dir = side === 'left' ? 1 : -1;
+        const x = side === 'left' ? -40 : state.w + 40;
+        const wingPhase = Math.random() * Math.PI * 2;
+        const bird = {
+          x, y,
+          vx: dir * speed,
+          vy: rand(-10, 10),
+          baseVy: rand(-8, 8),
+          amp: rand(10, 30),
+          flap: wingPhase,
+          scared: false,
+          dropCd: rand(0.8, 2.0),
+          size: rand(10, 16),
+          life: 0
+        };
+        state.birds.push(bird);
+      }
+
+      function addDropping(x, y) {
+        state.droppings.push({ x, y, vy: rand(120, 200), r: rand(2, 3.5) });
+      }
+
+      function addStain(x, y) {
+        const r = rand(7, 16);
+        state.stains.push({ x, y, r, t: 0 });
+        // hygiene loss
+        state.cleanliness = clamp(state.cleanliness - rand(1.2, 2.5), 0, 100);
+      }
+
+      function update(dt) {
+        if (!state.running || state.paused || state.gameOver) return;
+
+        state.time += dt;
+        timeEl.textContent = state.time.toFixed(1) + " s";
+
+        // Difficulty ramps: spawn faster over time
+        state.difficultyTimer += dt;
+        if (state.difficultyTimer > 10) {
+          state.difficultyTimer = 0;
+          state.spawnInterval = clamp(state.spawnInterval * 0.9, 450, 1500);
+        }
+
+        state.spawnTimer += dt * 1000;
+        if (state.spawnTimer >= state.spawnInterval) {
+          state.spawnTimer = 0;
+          // spawn 1-3 birds randomly at higher difficulty
+          const group = (state.spawnInterval < 700) ? (Math.random() < 0.33 ? 2 : 1) : 1;
+          for (let i = 0; i < group; i++) spawnBird();
+        }
+
+        // Birds
+        for (let i = state.birds.length - 1; i >= 0; i--) {
+          const b = state.birds[i];
+          b.life += dt;
+
+          // Flap & slight sine wave motion
+          b.flap += dt * 8;
+          b.vy = b.baseVy + Math.sin(b.flap) * b.amp * 0.2;
+
+          // If laser close -> scared (accelerate away from pointer)
+          const fearDist2 = 90 * 90;
+          if (state.pointer.active && dist2(b.x, b.y, state.pointer.x, state.pointer.y) < fearDist2) {
+            const dx = b.x - state.pointer.x;
+            const dy = b.y - state.pointer.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const ax = (dx / len) * 600;  // acceleration away
+            const ay = (dy / len) * 600 - 200; // go up a bit
+            b.vx += ax * dt;
+            b.vy += ay * dt;
+            b.scared = true;
+          } else if (b.scared) {
+            // slowly calm down
+            b.vx *= (1 - 0.5 * dt);
+            b.vy *= (1 - 0.5 * dt);
+          }
+
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+
+          // Droppings (not when very scared / moving up fast)
+          b.dropCd -= dt;
+          if (b.dropCd <= 0 && b.vy > -60) {
+            b.dropCd = rand(1.2, 2.5);
+            addDropping(b.x, b.y + 4);
+          }
+
+          // Remove if off screen for a while
+          if (b.x < -80 || b.x > state.w + 80 || b.y < -80 || b.y > state.h + 80) {
+            state.birds.splice(i, 1);
           }
         }
-        // Frame lines
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-        ctx.strokeRect(px+0.5, py+0.5, cellW-1, cellH-1);
+
+        // Droppings
+        const g = 600;
+        for (let i = state.droppings.length - 1; i >= 0; i--) {
+          const d = state.droppings[i];
+          d.vy += g * dt;
+          d.y += d.vy * dt;
+
+          // Hit roof?
+          const r = state.roof;
+          if (d.y >= r.y && d.x >= r.x && d.x <= r.x + r.w) {
+            addStain(d.x, r.y + Math.min((d.y - r.y), r.h - 6));
+            state.droppings.splice(i, 1);
+            continue;
+          }
+          // Off screen
+          if (d.y > state.h + 50) state.droppings.splice(i, 1);
+        }
+
+        // Cleanliness check
+        cleanBar.style.width = (state.cleanliness | 0) + "%";
+        cleanPctEl.textContent = (state.cleanliness | 0) + "%";
+        if (state.cleanliness <= 0) {
+          endGame();
+        }
       }
-    }
 
-    // Stains
-    for (const s of state.stains) {
-      drawSplat(s.x, s.y, s.r);
-    }
+      function endGame() {
+        state.gameOver = true;
+        state.running = false;
+        const msg = `Spillet over • Tid: ${state.time.toFixed(1)} s`;
+        if (state.time > state.best) {
+          state.best = state.time;
+          localStorage.setItem('makefritt_hs', String(state.best));
+          bestEl.textContent = state.best.toFixed(1) + " s";
+          showOverlay(true, msg + " (ny rekord!)");
+        } else {
+          showOverlay(true, msg);
+        }
+        pauseBtn.textContent = 'Pause';
+        titleEl.textContent = 'Måkefritt tak';
+      }
 
-    // Droppings (in air)
-    ctx.fillStyle = '#fff';
-    for (const d of state.droppings) {
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
-      ctx.fill();
-    }
+      // Drawing
+      function draw() {
+        const w = state.w, h = state.h;
+        // Sky is background via CSS
 
-    // Birds
-    for (const b of state.birds) {
-      drawBird(b);
-    }
+        // Soft clouds (simple parallax bands)
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#fff';
+        for (let i = 0; i < 5; i++) {
+          const yy = 40 + i * 50 + Math.sin((performance.now() / 2000) + i) * 12;
+          ctx.beginPath();
+          for (let x = -100; x < w + 100; x += 120) {
+            const r = 28 + (i * 3);
+            ctx.moveTo(x, yy);
+            ctx.arc(x, yy, r, 0, Math.PI * 2);
+          }
+          ctx.fill();
+        }
+        ctx.restore();
 
-    // Laser
-    drawLaser();
+        // Roof + panels
+        const r = state.roof;
+        // Roof base
+        ctx.fillStyle = '#5d6066';
+        roundRect(ctx, r.x, r.y, r.w, r.h, 10, true, false);
 
-    // HUD is HTML
-  }
+        // Panel grid
+        const cols = Math.max(6, Math.floor(r.w / 120));
+        const rows = Math.max(3, Math.floor(r.h / 70));
+        const pad = 6;
+        const gap = 6;
+        const cellW = (r.w - pad * 2 - gap * (cols - 1)) / cols;
+        const cellH = (r.h - pad * 2 - gap * (rows - 1)) / rows;
+        for (let cy = 0; cy < rows; cy++) {
+          for (let cx = 0; cx < cols; cx++) {
+            const px = r.x + pad + cx * (cellW + gap);
+            const py = r.y + pad + cy * (cellH + gap);
+            ctx.fillStyle = '#0c2744';
+            roundRect(ctx, px, py, cellW, cellH, 6, true, false);
+            // Cells
+            ctx.fillStyle = '#0e3159';
+            const subCols = 4;
+            const subRows = 6;
+            const sgap = 2;
+            const sw = (cellW - (subCols + 1) * sgap) / subCols;
+            const sh = (cellH - (subRows + 1) * sgap) / subRows;
+            for (let sy = 0; sy < subRows; sy++) {
+              for (let sx = 0; sx < subCols; sx++) {
+                const sxp = px + sgap + sx * (sw + sgap);
+                const syp = py + sgap + sy * (sh + sgap);
+                ctx.fillRect(sxp, syp, sw, sh);
+              }
+            }
+            // Frame lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.strokeRect(px + 0.5, py + 0.5, cellW - 1, cellH - 1);
+          }
+        }
 
-  function drawBird(b) {
-    ctx.save();
-    ctx.translate(b.x, b.y);
-    const scale = b.size/12;
-    ctx.scale(scale, scale);
+        // Stains
+        for (const s of state.stains) {
+          drawSplat(s.x, s.y, s.r);
+        }
 
-    // Body
-    ctx.fillStyle = '#e6eef5';
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 10, 6, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.stroke();
+        // Droppings (in air)
+        ctx.fillStyle = '#fff';
+        for (const d of state.droppings) {
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-    // Head
-    ctx.beginPath();
-    ctx.arc(10, -2, 3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.stroke();
+        // Birds
+        for (const b of state.birds) {
+          drawBird(b);
+        }
 
-    // Beak
-    ctx.fillStyle = '#ffdd68';
-    ctx.beginPath();
-    ctx.moveTo(13, -2);
-    ctx.lineTo(17, 0);
-    ctx.lineTo(13, 1);
-    ctx.closePath();
-    ctx.fill();
+        // Laser
+        drawLaser();
 
-    // Eye
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(11, -3, 0.8, 0, Math.PI*2);
-    ctx.fill();
+        // HUD is HTML
+      }
 
-    // Wings
-    ctx.strokeStyle = '#e6eef5';
-    ctx.lineWidth = 3;
-    const wPhase = Math.sin(b.flap)*8;
-    ctx.beginPath();
-    ctx.moveTo(-2, -1);
-    ctx.quadraticCurveTo(-10, -6 - wPhase, -16, -2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-2, 1);
-    ctx.quadraticCurveTo(-10, 6 + wPhase, -16, 2);
-    ctx.stroke();
+      function drawBird(b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        const scale = b.size / 12;
+        ctx.scale(scale, scale);
 
-    ctx.restore();
-  }
+        // Body
+        ctx.fillStyle = '#e6eef5';
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 10, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
 
-  function drawLaser() {
-    const turret = { x: state.roof.x + state.roof.w*0.5, y: state.roof.y + state.roof.h + 6 };
-    const p = state.pointer;
-    ctx.save();
-    // Beam
-    ctx.globalAlpha = p.active ? 0.8 : 0.4;
-    ctx.lineWidth = 2;
-    const grad = ctx.createLinearGradient(turret.x, turret.y, p.x, p.y);
-    grad.addColorStop(0, 'rgba(255,255,255,0.0)');
-    grad.addColorStop(0.3, 'rgba(255,255,255,0.5)');
-    grad.addColorStop(1, '#aef2ff');
-    ctx.strokeStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(turret.x, turret.y);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
+        // Head
+        ctx.beginPath();
+        ctx.arc(10, -2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
 
-    // Dot
-    ctx.globalAlpha = p.active ? 1 : 0.7;
-    ctx.fillStyle = '#aef2ff';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
-    ctx.fill();
+        // Beak
+        ctx.fillStyle = '#ffdd68';
+        ctx.beginPath();
+        ctx.moveTo(13, -2);
+        ctx.lineTo(17, 0);
+        ctx.lineTo(13, 1);
+        ctx.closePath();
+        ctx.fill();
 
-    // Turret
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = '#3c3f44';
-    roundRect(ctx, turret.x-10, turret.y-10, 20, 10, 3, true, false);
-    ctx.restore();
-  }
+        // Eye
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(11, -3, 0.8, 0, Math.PI * 2);
+        ctx.fill();
 
-  function drawSplat(x, y, r) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    for (let i=0;i<6;i++) {
-      const a = (i/6)*Math.PI*2 + Math.random()*0.1;
-      const rr = r * (0.7 + Math.random()*0.5);
-      ctx.beginPath();
-      ctx.ellipse(Math.cos(a)*rr*0.5, Math.sin(a)*rr*0.2, rr*0.9, rr*0.6, a, 0, Math.PI*2);
-      ctx.fill();
-    }
-    // center blob
-    ctx.beginPath();
-    ctx.arc(0,0, r*0.8, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
+        // Wings
+        ctx.strokeStyle = '#e6eef5';
+        ctx.lineWidth = 3;
+        const wPhase = Math.sin(b.flap) * 8;
+        ctx.beginPath();
+        ctx.moveTo(-2, -1);
+        ctx.quadraticCurveTo(-10, -6 - wPhase, -16, -2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-2, 1);
+        ctx.quadraticCurveTo(-10, 6 + wPhase, -16, 2);
+        ctx.stroke();
 
-  function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-    if (typeof r === 'number') r = {tl:r,tr:r,br:r,bl:r};
-    ctx.beginPath();
-    ctx.moveTo(x+r.tl, y);
-    ctx.lineTo(x+w-r.tr, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r.tr);
-    ctx.lineTo(x+w, y+h-r.br);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r.br, y+h);
-    ctx.lineTo(x+r.bl, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r.bl);
-    ctx.lineTo(x, y+r.tl);
-    ctx.quadraticCurveTo(x, y, x+r.tl, y);
-    if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
-  }
+        ctx.restore();
+      }
 
-  // Main loop
-  let last = performance.now();
-  function frame(now) {
-    const dt = Math.min(0.033, (now - last)/1000);
-    last = now;
-    update(dt);
-    ctx.clearRect(0,0, state.w, state.h);
-    draw();
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+      function drawLaser() {
+        const turret = { x: state.roof.x + state.roof.w * 0.5, y: state.roof.y + state.roof.h + 6 };
+        const p = state.pointer;
+        ctx.save();
+        // Beam
+        ctx.globalAlpha = p.active ? 0.8 : 0.4;
+        ctx.lineWidth = 2;
+        const grad = ctx.createLinearGradient(turret.x, turret.y, p.x, p.y);
+        grad.addColorStop(0, 'rgba(255,255,255,0.0)');
+        grad.addColorStop(0.3, 'rgba(255,255,255,0.5)');
+        grad.addColorStop(1, '#aef2ff');
+        ctx.strokeStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(turret.x, turret.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
 
-  // Start with overlay visible
-  showOverlay(true, '');
-  titleEl.textContent = 'Måkefritt tak';
+        // Dot
+        ctx.globalAlpha = p.active ? 1 : 0.7;
+        ctx.fillStyle = '#aef2ff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        ctx.fill();
 
-})();
-</script>
+        // Turret
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = '#3c3f44';
+        roundRect(ctx, turret.x - 10, turret.y - 10, 20, 10, 3, true, false);
+        ctx.restore();
+      }
+
+      function drawSplat(x, y, r) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2 + Math.random() * 0.1;
+          const rr = r * (0.7 + Math.random() * 0.5);
+          ctx.beginPath();
+          ctx.ellipse(Math.cos(a) * rr * 0.5, Math.sin(a) * rr * 0.2, rr * 0.9, rr * 0.6, a, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // center blob
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+        if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+        ctx.beginPath();
+        ctx.moveTo(x + r.tl, y);
+        ctx.lineTo(x + w - r.tr, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+        ctx.lineTo(x + w, y + h - r.br);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+        ctx.lineTo(x + r.bl, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+        ctx.lineTo(x, y + r.tl);
+        ctx.quadraticCurveTo(x, y, x + r.tl, y);
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      // Main loop
+      let last = performance.now();
+      function frame(now) {
+        const dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+        update(dt);
+        ctx.clearRect(0, 0, state.w, state.h);
+        draw();
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+
+      // Start with overlay visible
+      showOverlay(true, '');
+      titleEl.textContent = 'Måkefritt tak';
+
+    })();
+  </script>
 </body>
+
 </html>
